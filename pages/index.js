@@ -19,10 +19,10 @@ export default function Home() {
       if (data.downloadUrl) {
         setVideoLink(data.downloadUrl);
       } else {
-        alert(data.error || "Could not fetch video. Try another link.");
+        alert("Check the API key or video link.");
       }
     } catch (err) {
-      alert("System Error. Please try again later.");
+      alert("System error. Try again.");
     }
     setLoading(false);
   };
@@ -49,15 +49,27 @@ export default function Home() {
         </div>
 
         {videoLink && (
-          <div className="mt-10 w-full animate-bounce">
+          <div className="mt-8 w-full flex flex-col items-center">
+             {/* Built-in Player for Mobile Browsers to "See" the file */}
+             <video 
+                src={videoLink} 
+                controls 
+                className="w-full rounded-xl shadow-lg border-2 border-gray-700 mb-6"
+                style={{ maxHeight: '300px' }}
+             />
+             
              <a 
                 href={videoLink} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="block w-full text-center bg-green-500 text-white py-6 rounded-2xl font-black text-xl shadow-lg border-2 border-white"
+                download="tiktok_video.mp4"
+                target="_self" 
+                className="block w-full text-center bg-green-500 text-white py-6 rounded-2xl font-black text-xl shadow-lg border-2 border-white active:bg-green-600"
              >
-                DOWNLOAD NOW
+                CLICK TO DOWNLOAD
              </a>
+             
+             <p className="mt-4 text-gray-400 text-sm text-center">
+                If the button just plays the video, <b>long-press the video above</b> and select <b>"Save Video"</b>.
+             </p>
           </div>
         )}
       </div>
