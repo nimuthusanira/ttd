@@ -4,11 +4,13 @@ export default function Home() {
   const [url, setUrl] = useState('');
   const [videoLink, setVideoLink] = useState('');
   const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const getDownloadLink = async () => {
     if (!url) return alert("Paste a link first!");
     setLoading(true);
-    setVideoLink(''); // Reset link while loading
+    setVideoLink('');
+    setCopied(false);
     try {
       const res = await fetch('/api/download', {
         method: 'POST',
@@ -24,51 +26,62 @@ export default function Home() {
     setLoading(false);
   };
 
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(videoLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
       <div className="flex-grow flex flex-col items-center justify-center w-full max-w-md">
-        <h1 className="text-4xl font-bold mb-8 text-pink-500 text-center">TikTok Downloader</h1>
+        <h1 className="text-4xl font-bold mb-8 text-pink-500 text-center uppercase tracking-widest">TTD Pro</h1>
         
-        <div className="bg-gray-800 p-6 rounded-2xl shadow-xl w-full">
+        <div className="bg-gray-800 p-6 rounded-2xl shadow-xl w-full border border-gray-700">
           <input 
-            className="w-full p-4 rounded bg-gray-700 border border-gray-600 mb-4 outline-none focus:border-pink-500 text-white text-lg" 
-            placeholder="Paste TikTok Link..." 
+            className="w-full p-4 rounded bg-gray-900 border border-gray-700 mb-4 outline-none focus:border-pink-500 text-white text-lg" 
+            placeholder="Paste Link..." 
             value={url}
             onChange={(e) => setUrl(e.target.value)}
           />
           <button 
             onClick={getDownloadLink}
-            className="w-full bg-pink-600 py-4 rounded-xl font-bold text-xl hover:bg-pink-700 transition active:scale-95"
+            className="w-full bg-gradient-to-r from-pink-600 to-purple-600 py-4 rounded-xl font-bold text-xl active:scale-95 transition"
           >
-            {loading ? 'Processing...' : 'Get Video'}
+            {loading ? 'SEARCHING...' : 'GET VIDEO'}
           </button>
         </div>
 
         {videoLink && (
-          <div className="mt-10 w-full flex flex-col items-center animate-fade-in">
-             {/* THE BIG DOWNLOAD BUTTON */}
+          <div className="mt-8 w-full space-y-4">
+             {/* Primary Download */}
              <a 
                 href={videoLink} 
-                download="tiktok-video.mp4"
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-full text-center bg-green-500 hover:bg-green-600 text-white px-6 py-8 rounded-2xl font-black text-2xl shadow-2xl transition-all active:scale-95 border-4 border-white"
+                download
+                className="block w-full text-center bg-green-600 py-6 rounded-2xl font-black text-xl border-b-4 border-green-800 active:border-b-0 active:translate-y-1 transition-all"
              >
-                📥 CLICK TO SAVE VIDEO
+                SAVE TO DEVICE
              </a>
-             
-             <div className="mt-6 p-4 bg-gray-800 rounded-lg border border-dashed border-gray-600 text-center">
-                <p className="text-yellow-400 font-bold mb-2">iPhone/Android Tip:</p>
-                <p className="text-gray-300 text-sm">
-                  If the video just starts playing, <b>long-press</b> the video and select <b>"Download Video"</b> or <b>"Save to Files"</b>.
+
+             {/* Secondary Copy Link */}
+             <button 
+                onClick={copyToClipboard}
+                className="w-full bg-gray-700 py-4 rounded-xl font-bold text-gray-200 border border-gray-600 active:bg-gray-600"
+             >
+                {copied ? '✅ LINK COPIED!' : '🔗 COPY RAW LINK'}
+             </button>
+
+             <div className="p-4 bg-blue-900/30 rounded-xl border border-blue-500/50 text-center">
+                <p className="text-blue-300 text-sm font-medium">
+                  If the Save button opens the player, tap the <b>Share icon</b> on your browser and select <b>"Save to Files"</b> or <b>"Download"</b>.
                 </p>
              </div>
           </div>
         )}
       </div>
 
-      <footer className="w-full text-center py-6 text-gray-500 text-sm border-t border-gray-800 mt-10">
-        <p>© {new Date().getFullYear()} nimuthusanira. All rights reserved.</p>
+      <footer className="w-full text-center py-6 text-gray-600 text-xs mt-10">
+        <p>© {new Date().getFullYear()} nimuthusanira | Built with Gemini</p>
       </footer>
     </div>
   );
