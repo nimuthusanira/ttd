@@ -19,10 +19,31 @@ export default function Home() {
       if (data.downloadUrl) {
         setVideoLink(data.downloadUrl);
       } else {
-        alert("Check the API key or video link.");
+        alert("Video not found or API limit reached.");
       }
     } catch (err) {
       alert("System error. Try again.");
+    }
+    setLoading(false);
+  };
+
+  // This function forces the browser to download the file instead of playing it
+  const forceDownload = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(videoLink);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = "tiktok-video.mp4";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (e) {
+      // If blob fails (CORS), open in new window as backup
+      window.location.href = videoLink;
     }
     setLoading(false);
   };
@@ -44,31 +65,21 @@ export default function Home() {
             disabled={loading}
             className="w-full bg-pink-600 hover:bg-pink-700 py-4 rounded-xl font-bold text-lg transition active:scale-95 disabled:opacity-50"
           >
-            {loading ? 'PLEASE WAIT...' : 'GET VIDEO'}
+            {loading ? 'PROCESSING...' : 'GET VIDEO'}
           </button>
         </div>
 
         {videoLink && (
-          <div className="mt-8 w-full flex flex-col items-center">
-             {/* Built-in Player for Mobile Browsers to "See" the file */}
-             <video 
-                src={videoLink} 
-                controls 
-                className="w-full rounded-xl shadow-lg border-2 border-gray-700 mb-6"
-                style={{ maxHeight: '300px' }}
-             />
-             
-             <a 
-                href={videoLink} 
-                download="tiktok_video.mp4"
-                target="_self" 
-                className="block w-full text-center bg-green-500 text-white py-6 rounded-2xl font-black text-xl shadow-lg border-2 border-white active:bg-green-600"
+          <div className="mt-10 w-full flex flex-col items-center">
+             <button 
+                onClick={forceDownload}
+                className="w-full bg-green-500 text-white py-6 rounded-2xl font-black text-xl shadow-lg border-2 border-white active:bg-green-600 transition-all"
              >
-                CLICK TO DOWNLOAD
-             </a>
+                {loading ? 'DOWNLOADING...' : '⬇️ DOWNLOAD NOW'}
+             </button>
              
-             <p className="mt-4 text-gray-400 text-sm text-center">
-                If the button just plays the video, <b>long-press the video above</b> and select <b>"Save Video"</b>.
+             <p className="mt-6 text-gray-400 text-sm text-center px-4">
+                This will save the video directly to your <b>Files</b> or <b>Gallery</b>.
              </p>
           </div>
         )}
